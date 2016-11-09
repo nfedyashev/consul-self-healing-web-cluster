@@ -1,0 +1,15 @@
+---
+- include: roles/common/tasks/main.yml
+
+- name: load-balancer.yml | All roles
+  hosts: load-balancer
+  user: root
+  sudo: True
+
+  tasks:
+    - file: path=/root/sinatra-hello-world state=directory
+    - copy: src={{playbook_dir}}/files/nginx/site1.conf.ctpl dest=/etc/nginx/conf.d/site1.conf.ctpl
+    - shell: nohup consul-template -consul localhost:8500 -template "/etc/nginx/conf.d/site1.conf.ctpl:/etc/nginx/conf.d/site1.conf:service nginx restart" >consul-template.out 2>&1 &
+  roles:
+    - role: mats116.nginx
+      nginx_version: "1.9.5"

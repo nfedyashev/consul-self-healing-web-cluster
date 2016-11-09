@@ -1,0 +1,20 @@
+---
+- include: roles/common/tasks/main.yml
+
+- name: consulservers.yml | All roles
+  hosts: consulservers
+  user: root
+  sudo: True
+  tasks:
+    - file: path=/etc/consul.d state=directory
+    - shell: "nohup consul agent -server -ui -config-dir=/etc/consul.d -bootstrap-expect 3 -data-dir=/tmp/consul -advertise={{ ansible_default_ipv4.address }} --client=0.0.0.0 >consul.out 2>&1 &"
+  roles:
+    - { role: andrewrothstein.consul }
+
+- name: last consul server joining 2 others
+  hosts: consulservers[2]
+  user: root
+  sudo: True
+  tasks:
+    - shell: "consul join {{ hostvars[groups['consulservers'][0]]['ansible_default_ipv4']['address'] }}"
+    - shell: "consul join {{ hostvars[groups['consulservers'][1]]['ansible_default_ipv4']['address'] }}"

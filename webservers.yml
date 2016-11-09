@@ -1,0 +1,19 @@
+---
+- include: roles/common/tasks/main.yml
+
+- name: webservers.yml | All roles
+  hosts: webservers
+  user: root
+  sudo: True
+  tasks:
+    - file: path=/root/sinatra-hello-world state=directory
+    - copy: src={{playbook_dir}}/files/sinatra/Gemfile dest=/root/sinatra-hello-world/
+    - copy: src={{playbook_dir}}/files/sinatra/Gemfile.lock dest=/root/sinatra-hello-world/
+    - copy: src={{playbook_dir}}/files/sinatra/myapp.rb dest=/root/sinatra-hello-world/
+    - bundler: state=present gemfile=/root/sinatra-hello-world/Gemfile
+    - shell: cd sinatra-hello-world && nohup bundle exec ruby myapp.rb >myapp.out 2>&1 &
+    - file: path=/etc/consul.d state=directory
+    - copy: src={{playbook_dir}}/files/consul/web.json dest=/etc/consul.d/web.json
+    - shell: consul reload
+  roles:
+    - { role: geerlingguy.ruby }

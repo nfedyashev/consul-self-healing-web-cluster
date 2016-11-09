@@ -1,0 +1,11 @@
+[webservers]
+xx.xx.xx.xx
+yy.yy.yy.yy
+
+[load-balancer]
+zz.zz.zz.zz
+
+[consulservers]
+xx.xx.xx.xx
+yy.yy.yy.yy
+zz.zz.zz.zz

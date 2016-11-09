@@ -1,0 +1,10 @@
+- name: Install python
+  hosts: all
+  become: root
+  gather_facts: false
+
+  tasks:
+    - raw: which python || apt-get update
+    - raw: (which python && which aptitude) || apt-get install -y python python-apt aptitude
+  vars:
+    ansible_ssh_user: root
